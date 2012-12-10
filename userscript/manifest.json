@@ -4,14 +4,14 @@
   "manifest_version": 2,
   "description": "Generate stats on Kickstarter projects backed",
   "permissions": [
-    "http://www.kickstarter.com/"
+    "https://www.kickstarter.com/"
   ],
   "content_scripts" : [
     {
-      "matches" : ["http://www.kickstarter.com/profile/transactions*"],
+      "matches" : ["http://www.kickstarter.com/profile/*"],
       "js" : [ "kickback.js" ],
       "run_at" : "document_idle",
-      "all_frames" : false,
+      "all_frames" : true
 //      "css": [ ]
     }
   ]
