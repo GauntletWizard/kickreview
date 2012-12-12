@@ -8,7 +8,7 @@
   ],
   "content_scripts" : [
     {
-      "matches" : ["http://www.kickstarter.com/profile/*"],
+      "matches" : ["https://www.kickstarter.com/profile/*"],
       "js" : [ "kickback.js" ],
       "run_at" : "document_idle",
       "all_frames" : true
