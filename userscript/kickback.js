@@ -9,6 +9,7 @@ function grabPage(pagenum) {
   var request = new XMLHttpRequest;
   request.open("GET", root + String(pagenum), false);
   request.send();
+  console.debug("Requesting Page" + String(pagenum));
   var doc = document.implementation.createHTMLDocument("example");
   doc.documentElement.innerHTML = request.response;
 
