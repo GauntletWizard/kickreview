@@ -3,19 +3,6 @@
  */
 
 root = "https://www.kickstarter.com/profile/transactions?page="
-// htmldtd = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
-
-function grabPage(pagenum) {
-  var request = new XMLHttpRequest;
-  request.open("GET", root + String(pagenum), false);
-  console.debug("Requesting Page " + String(pagenum));
-  request.send();
-  var doc = document.implementation.createHTMLDocument("example");
-  doc.documentElement.innerHTML = request.response;
-  console.debug("Received Page " + String(pagenum));
-
-  return doc
-}
 
 //This is super fragile, as parsing goes, but they don't have CSS classes.
 function project(row) {
@@ -39,18 +26,12 @@ function isLastPage(page) {
 }
 
 function totals() {
-  var p = 1;
   total = 0;
   outstanding = 0;
   paid = 0;
   
-  var page = grabPage(p)
-  while (!isLastPage(page)) {
-    
-    backinglist = page.getElementsByClassName("backings")[0].children[1].children;
-    console.debug("Page " + String(p) +" has " + String(backinglist.length) + " projects.");
-    for (i = 0; i < backinglist.length; i++) {
-      pj = new project(backinglist[i]);
+    for (var i = 0; i < projects.length; i++) {
+      pj = projects[i];
       console.debug(total)
       if (pj.status == "In Progress") {
         outstanding = outstanding + pj.pledge;
@@ -60,9 +41,6 @@ function totals() {
       }
       total = total + pj.pledge;
     }
-    p = p + 1;
-    page = grabPage(p);
-  }
   return total;
 }
 
@@ -74,17 +52,17 @@ function parseProjects() {
     if (!isLastPage(doc)) {
       var backinglist = doc.getElementsByClassName("backings")[0].children[1].children;
       //For every row, parse as project and append to projects.
-      for (i = 0; i < backinglist.length; i++) {
+      for (var i = 0; i < backinglist.length; i++) {
         projects[projects.length] = new project(backinglist[i]);
       }
     } else {
       //Logic for grabbing pages past what we expected.
       if (this.pagenum == (numpages - 1)) {
         var request = new XMLHttpRequest;
-        request.pagenum = pagenum;
+        request.pagenum = this.pagenum + 1;
         request.onreadystatechange = parseProjects;
-	      request.open("GET", root + String(pagenum), true);
-    	  console.debug("Requesting Page " + String(pagenum));
+	      request.open("GET", root + String(this.pagenum + 1), true);
+    	  console.debug("Requesting Page " + String(this.pagenum + 1));
 	      request.send();
       }
     }
@@ -99,7 +77,7 @@ function grabAllPages() {
   // so we know that there's no more pages to come.
   numpages = document.getElementsByClassName("pagination")[0].children.length;
   projects = []
-  for (pagenum = 1; pagenum < numpages; pagenum++) {
+  for (var pagenum = 1; pagenum < numpages; pagenum++) {
     var request = new XMLHttpRequest;
     request.pagenum = pagenum;
     request.onreadystatechange = parseProjects;
@@ -108,6 +86,5 @@ function grabAllPages() {
 	  request.send();
   }
 }
-    
-    
-  
+
+document.onload = grabAllPages();
