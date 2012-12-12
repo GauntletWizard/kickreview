@@ -8,10 +8,11 @@ root = "https://www.kickstarter.com/profile/transactions?page="
 function grabPage(pagenum) {
   var request = new XMLHttpRequest;
   request.open("GET", root + String(pagenum), false);
+  console.debug("Requesting Page " + String(pagenum));
   request.send();
-  console.debug("Requesting Page" + String(pagenum));
   var doc = document.implementation.createHTMLDocument("example");
   doc.documentElement.innerHTML = request.response;
+  console.debug("Received Page " + String(pagenum));
 
   return doc
 }
@@ -22,7 +23,11 @@ function project(row) {
   this.projectLink = row.children[0].href;
   this.status = row.children[1].children[0].innerText;
   this.endDate = row.children[2].innerText;
-  this.pledge = Number(row.children[3].children[0].innerText.substr(1));
+  this.pledge = Number(row.children[3].children[0].innerText.substr(1).replace(/,/, ''));
+  if (isNaN(this.pledge)) {
+    console.debug("Not a valid pledge amount: " + row.children[3].children[0].innerText.substr(1));
+    this.pledge = 0;
+  }
   this.pledgeDate = row.children[3].children[2].innerText;
   this.pledgeStatus = row.children[4].innerText;
   this.reward = row.children[5].innerText;
@@ -39,11 +44,15 @@ function totals() {
   var page = grabPage(p)
   while (!isLastPage(page)) {
     
-    backinglist = page.getElementsByClassName("backings")[0].children[1]
+    backinglist = page.getElementsByClassName("backings")[0].children[1].children;
+    console.debug("Page " + String(p) +" has " + String(backinglist.length) + " projects.");
     for (i = 0; i < backinglist.length; i++) {
       pj = new project(backinglist[i]);
+      console.debug(total)
       total = total + pj.pledge;
     }
+    p = p + 1;
+    page = grabPage(p);
   }
   return total;
 }
