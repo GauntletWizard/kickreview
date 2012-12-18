@@ -4,7 +4,8 @@
   "manifest_version": 2,
   "description": "Generate stats on Kickstarter projects backed",
   "permissions": [
-    "https://www.kickstarter.com/"
+    "https://www.kickstarter.com/",
+    "storage"
   ],
   "content_scripts" : [
     {

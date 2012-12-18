@@ -5,7 +5,7 @@
 root = "https://www.kickstarter.com/profile/transactions?page="
 
 //This is super fragile, as parsing goes, but they don't have CSS classes.
-function project(row) {
+function Project(row) {
   this.projectName = row.children[0].innerText;
   this.projectLink = row.children[0].href;
   this.status = row.children[1].children[0].innerText;
@@ -53,7 +53,7 @@ function parseProjects() {
       var backinglist = doc.getElementsByClassName("backings")[0].children[1].children;
       //For every row, parse as project and append to projects.
       for (var i = 0; i < backinglist.length; i++) {
-        projects[projects.length] = new project(backinglist[i]);
+        projects[projects.length] = new Project(backinglist[i]);
       }
     } else {
       //Logic for grabbing pages past what we expected.
@@ -70,7 +70,27 @@ function parseProjects() {
 }
       
 
+function showRewardStatus() {
+  var backings = document.getElementsByClassName("backings")[0];
+  var header = backings.children[0].children[0];
+  var status = document.createElement("th");
+  status.innerHTML = "Reward Status";
+  header.appendChild(status);
 
+  var pjs = backings.children[1].children;
+  for (i = 0; i < pjs.length; i++) {
+    var pj = new Project(pjs[i]);
+      var status = document.createElement("td");
+    if (pj.pledgeStatus.search("Collected") != -1) {
+      status.innerHTML = pj.pledgeStatus;
+    } else if (pj.status.search("Unsuccessful") != -1) {
+      status.innerHTML = "Unfunded";
+    } else {
+      status.innerHTML = "Funding";
+    }
+    pjs[i].appendChild(status);
+  }
+}
 
 function grabAllPages() {
   // There's two extra children - One is used up by < numpages (rather than <=), the other is requested 
@@ -87,4 +107,12 @@ function grabAllPages() {
   }
 }
 
-document.onload = grabAllPages();
+function loaded() {
+  grabAllPages();
+  showRewardStatus();
+}
+
+myStorage = chrome.storage.local;  //Testing
+// myStorage = chrome.storage.sync;  //Live
+
+document.onload = loaded();
