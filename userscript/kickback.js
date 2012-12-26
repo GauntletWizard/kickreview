@@ -7,7 +7,7 @@ root = "https://www.kickstarter.com/profile/transactions?page="
 //This is super fragile, as parsing goes, but they don't have CSS classes.
 function Project(row) {
   this.projectName = row.children[0].innerText;
-  this.projectLink = row.children[0].href;
+  this.projectLink = row.children[0].children[0].href;
   this.status = row.children[1].children[0].innerText;
   this.endDate = row.children[2].innerText;
   this.pledge = Number(row.children[3].children[0].innerText.substr(1).replace(/,/, ''));
