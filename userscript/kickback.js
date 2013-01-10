@@ -2,12 +2,14 @@
  * @fileoverview Tools for managing your Kickstarted projects. www.kickreview.net
  */
 
-root = "https://www.kickstarter.com/profile/transactions?page="
+root = "https://www.kickstarter.com/profile/transactions?page=";
+dataPrefix = "ProjectStatus:";
 
 //This is super fragile, as parsing goes, but they don't have CSS classes.
 function Project(row) {
   this.projectName = row.children[0].innerText;
   this.projectLink = row.children[0].children[0].href;
+  this.projectID = this.projectLink.match("^http://www.kickstarter.com/projects/(.*)")[1];
   this.status = row.children[1].children[0].innerText;
   this.endDate = row.children[2].innerText;
   this.pledge = Number(row.children[3].children[0].innerText.substr(1).replace(/,/, ''));
@@ -78,17 +80,30 @@ function showRewardStatus() {
   header.appendChild(status);
 
   var pjs = backings.children[1].children;
+  pageProjects = [];
   for (i = 0; i < pjs.length; i++) {
     var pj = new Project(pjs[i]);
       var status = document.createElement("td");
+      status.id= pj.projectID;
     if (pj.pledgeStatus.search("Collected") != -1) {
-      status.innerHTML = pj.pledgeStatus;
+      status.innerHTML = '<span><input type="radio" name="' + pj.projectName +
+          '" onclick="console.log(this)" value="received">Received</span>' +
+          "";
+      pageProjects.push(dataPrefix + pj.projectLink);
     } else if (pj.status.search("Unsuccessful") != -1) {
       status.innerHTML = "Unfunded";
     } else {
       status.innerHTML = "Funding";
     }
     pjs[i].appendChild(status);
+    myStorage.get(pageProjects, statusCallback);
+  }
+}
+
+function statusCallback(items) {
+  console.log(items);
+  for (project in items) {
+    console.log(project, items[project]);
   }
 }
 
