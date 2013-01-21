@@ -4,12 +4,14 @@
 
 root = "https://www.kickstarter.com/profile/transactions?page=";
 dataPrefix = "ProjectStatus:";
+content = "<table class='backings'><thead><tr><th>Project Statistics</th><th></th></tr></thead>"
 
 //This is super fragile, as parsing goes, but they don't have CSS classes.
 function Project(row) {
   this.projectName = row.children[0].innerText;
   this.projectLink = row.children[0].children[0].href;
-  this.projectID = this.projectLink.match("^http://www.kickstarter.com/projects/(.*)")[1];
+  console.debug(this.projectLink);
+  this.projectID = this.projectLink.match("^https?://www.kickstarter.com/projects/(.*)")[1];
   this.status = row.children[1].children[0].innerText;
   this.endDate = row.children[2].innerText;
   this.pledge = Number(row.children[3].children[0].innerText.substr(1).replace(/,/, ''));
@@ -21,6 +23,8 @@ function Project(row) {
   this.pledgeDate = row.children[3].children[2].innerText;
   this.pledgeStatus = row.children[4].innerText;
   this.reward = row.children[5].innerText;
+  var rewardCost = Number(this.reward.match("[\$|£]([\d\.]*) -"));
+  this.overage = this.pledge - rewardCost;
 }
 
 function isLastPage(page) {
@@ -112,7 +116,7 @@ function grabAllPages() {
   // so we know that there's no more pages to come.
   numpages = document.getElementsByClassName("pagination")[0].children.length;
   projects = []
-  for (var pagenum = 1; pagenum < numpages; pagenum++) {
+  for (var pagenum = 1; pagenum < numpages - 1; pagenum++) {
     var request = new XMLHttpRequest;
     request.pagenum = pagenum;
     request.onreadystatechange = parseProjects;
