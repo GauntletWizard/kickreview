@@ -8,11 +8,11 @@ content = "<table class='backings'><thead><tr><th>Project Statistics</th><th></t
 
 //This is super fragile, as parsing goes, but they don't have CSS classes.
 function Project(row) {
+  console.debug(row);
   this.projectName = row.children[0].innerText;
-  this.projectLink = row.children[0].children[0].href;
-  console.debug(this.projectLink);
+  this.projectLink = row.children[0].children[0].attributes["href"].value;
   try {
-    this.projectID = this.projectLink.match("^(https?://www.kickstarter.com/projects/)?(.*)")[2];
+    this.projectID = this.projectLink.match("^(https?://www.kickstarter.com)?/projects/(.*)")[2];
   } catch(TypeError) {
     console.debug("Typeerror on " + this.projectLink);
     console.debug(row);
