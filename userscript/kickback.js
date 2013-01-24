@@ -28,7 +28,7 @@ function Project(row) {
   this.pledgeDate = row.children[3].children[2].innerText;
   this.pledgeStatus = row.children[4].innerText;
   this.reward = row.children[5].innerText;
-  var rewardCost = Number(this.reward.match("[\$|£]([\d\.]*) -"));
+  var rewardCost = Number(this.reward.match(/[\$|£]([\d\.]*) -/)[1]);
   this.overage = this.pledge - rewardCost;
 }
 
@@ -110,7 +110,7 @@ function showRewardStatus() {
 }
 
 function statusCallback(items) {
-  console.log(items);
+  // console.log(items);
   for (project in items) {
     console.log(project, items[project]);
   }
