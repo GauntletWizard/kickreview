@@ -9,10 +9,12 @@ content = "<table class='backings'><thead><tr><th>Project Statistics</th><th></t
 //This is super fragile, as parsing goes, but they don't have CSS classes.
 function Project(row) {
   this.projectName = row.children[0].innerText;
-  this.projectLink = row.children[0].children[0].href;
-  console.debug(this.projectLink);
+  this.projectLink = console.debug(row.children[0].href);
+
+//  console.debug(this.projectLink);
   try {
-    this.projectID = this.projectLink.match("^(https?://www.kickstarter.com/projects/)?(.*)")[2];
+    //this.projectID = 
+    console.debug(this.projectLink.match("^(https?://www.kickstarter.com/projects/)?(.*)")[2]);
   } catch(TypeError) {
     console.debug("Typeerror on " + this.projectLink);
     console.debug(row);
@@ -28,7 +30,7 @@ function Project(row) {
   this.pledgeDate = row.children[3].children[2].innerText;
   this.pledgeStatus = row.children[4].innerText;
   this.reward = row.children[5].innerText;
-  var rewardCost = Number(this.reward.match("[\$|£]([\d\.]*) -"));
+  var rewardCost = Number(this.reward.match(/[\$|£]([\d\.]*) -/)[1]);
   this.overage = this.pledge - rewardCost;
 }
 
@@ -110,7 +112,7 @@ function showRewardStatus() {
 }
 
 function statusCallback(items) {
-  console.log(items);
+  // console.log(items);
   for (project in items) {
     console.log(project, items[project]);
   }
